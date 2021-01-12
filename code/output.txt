@@ -1,0 +1,4 @@
+Total data number is 15230 
+Train data number is 9138 
+Test data number is 3046 
+Valid data number is 3046 
