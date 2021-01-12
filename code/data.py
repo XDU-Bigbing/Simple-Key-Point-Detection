@@ -65,10 +65,6 @@ class Loader(Dataset):
         y = torch.LongTensor(y)
         return x, y
 
-    # 返回数据集的大小
-    def __len__(self):
-        return self.batchsz
-
     def calc_pic_normal_sigma(self):
         '''
         计算图像的均值和方差
