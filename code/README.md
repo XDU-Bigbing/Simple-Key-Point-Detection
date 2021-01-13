@@ -2,6 +2,7 @@
 - `utils.py`：小工具
 - `train.py`：主文件
 - `output.txt`：日志输出文件
+- `cut_pic.py`：将图片切成 `512 X 512` 均匀大小
 
 # 注意
 

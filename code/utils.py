@@ -1,5 +1,16 @@
 import json
 
+'''
+File: utils.py
+Project: code
+File Created: Wednesday, 13th January 2021 9:49:12 am
+-----------
+Last Modified: Wednesday, 13th January 2021 4:10:08 pm
+Copyright 2020 - 2021 XDU, XDU-BigBing
+-----------
+Description: 一些用到的小工具
+'''
+
 def get_data_num(filename):
     '''
     获取一共有多少数据

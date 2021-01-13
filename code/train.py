@@ -1,3 +1,14 @@
+'''
+File: data.py
+Project: code
+File Created: Wednesday, 13th January 2021 9:49:12 am
+-----------
+Last Modified: Wednesday, 13th January 2021 4:07:09 pm
+Copyright 2020 - 2021 XDU, XDU-BigBing
+-----------
+Description: 主文件
+'''
+
 import utils
 from data import Loader
 from torch.utils.data import DataLoader

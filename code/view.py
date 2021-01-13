@@ -1,3 +1,14 @@
+'''
+File: view.py
+Project: code
+File Created: Wednesday, 13th January 2021 9:53:01 am
+-----------
+Last Modified: Wednesday, 13th January 2021 4:09:03 pm
+Copyright 2020 - 2021 XDU, XDU BigBing
+-----------
+Description: 独立于项目，每个类随机选择 10 张图片，标注异常区域，观察结果
+'''
+
 import json
 import random
 from PIL import Image, ImageDraw

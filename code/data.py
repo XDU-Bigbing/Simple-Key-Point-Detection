@@ -1,3 +1,14 @@
+'''
+File: data.py
+Project: code
+File Created: Wednesday, 13th January 2021 9:49:12 am
+-----------
+Last Modified: Wednesday, 13th January 2021 4:10:54 pm
+Copyright 2020 - 2021 XDU, XDU-BigBing
+-----------
+Description: 加载数据的类
+'''
+
 import json
 import numpy as np
 from PIL import Image
