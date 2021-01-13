@@ -1,5 +1,6 @@
 import utils
 from data import Loader
+from torch.utils.data import DataLoader
 
 
 if __name__ == "__main__":
@@ -48,4 +49,20 @@ if __name__ == "__main__":
     print('Train data has been loaded')
 
     # 一批训练的数据量
-    batchsz = 16
+    batchsz = 1
+    epochs = 200
+
+    db_train = DataLoader(dataset=DATA, 
+                        batch_size=batchsz, 
+                        shuffle=True,
+                        pin_memory=True)
+
+    for epoch in range(epochs):
+        for step, batch in enumerate(db_train):
+            print(batch[0].size())
+            # x = batch[0]
+            # print(x)
+            # y = batch[1]
+            # print(y)
+            
+        print('Epoch {} ----------------------'.format(epoch))

@@ -1,6 +1,7 @@
 import json
 import numpy as np
 from PIL import Image
+from torch import zeros, from_numpy
 from torch.utils.data import Dataset
 from torchvision.transforms import transforms
 
@@ -23,7 +24,7 @@ class Loader(Dataset):
         # 图片格式转换
         self._transform = transforms.Compose([
             # RGB 形式打开
-            lambda x: Image.open(x).convert('RGB'),
+            lambda x: Image.open(self._data_path + x).convert('RGB'),
             # 将取值范围 [0, 255] 的 [高度 宽度 通道] 图片转换为
             # [0, 1] 的 [通道，高度，宽度] 图片 
             transforms.ToTensor(),
@@ -43,7 +44,7 @@ class Loader(Dataset):
         # 文件名
         self._x_path = []
         # 标签
-        self._y = []        
+        self._y = []
         # 尺寸
         self._size = []
         # 位置
@@ -62,8 +63,13 @@ class Loader(Dataset):
     def __getitem__(self, index):
         x = self._x_path[index]
         x = self._transform(x)
-        y = torch.LongTensor(y)
-        return x, y
+        y = self._y[index]
+        tmp = zeros((6, 1))
+        tmp[y-1, 0] = 1
+        return x, tmp
+
+    def __len__(self):
+        return len(self._x_path)
 
     def calc_pic_normal_sigma(self):
         '''
