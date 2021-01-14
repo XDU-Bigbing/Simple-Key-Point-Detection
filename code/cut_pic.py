@@ -1,4 +1,4 @@
-'''
+"""
 File: cut_pic.py
 Project: code
 File Created: Wednesday, 13th January 2021 4:03:59 pm
@@ -7,12 +7,135 @@ Last Modified: Wednesday, 13th January 2021 4:05:03 pm
 Copyright 2020 - 2021 XDU, XDU
 -----------
 Description: 
+    - 将切分 图片 和 json 文件保存到 cut_pic 文件夹
     - 将图片切成 512 X 512 均匀大小
     - 正样本含目标区域，负样本不含目标区域
     - 生成 json 文件，用来指明图片是否为正样本、文件名、目标区域、类别
-'''
+"""
 
+import utils
+import random, json
+from PIL import Image
+
+
+def select_pic(sample_num, json_path, data_path, all=False):
+    """
+    选择要被裁剪的图片
+    all == True 时，裁剪所有图片
+    """
+
+    if all == False:
+        d = utils.select_pic(json_path=json_path, data_path=data_path)
+        return d
+
+    if all == True:
+        # 打开全部文件，裁剪
+        pass
+
+
+def sample(selected, cut_num, size, json_path, data_path):
+    """
+    采样 含异常区域的成为正样本 不含异常区域的称为负样本
+    """
+    ls = []
+    # 对索引编号
+    name = 0
+    bbox = 1
+    image_height = 3
+    image_width = 4
+    cnt = 0
+    # 字典 正确
+    for key, value in selected.items():
+        for i, _ in enumerate(value):
+            with Image.open(data_path + value[i][name]) as im:
+                # 获取四个顶点
+                x0, y0 = value[i][bbox][0], value[i][bbox][1]
+                x1, y1 = value[i][bbox][2], value[i][bbox][3]
+
+                # 产生随机整数，涵盖此区域几个
+                for j in range(cut_num):
+                    # 保存正样本
+                    dict_p = {}
+                    left, top = None, None
+                    # 从 [left, top] 开始裁剪
+                    # 裁剪大小为 [left->left+size, top->top+size]
+                    
+                    # 如果损坏区域大于 size
+                    if y1 - y0 > size:
+                        top = random.randint(int(y0) + 10 - size, int(y0))
+                    if x1 - x0 > size:
+                        left = random.randint(int(x0) + 10 - size, int(x0))
+
+                    # 如果顶点左侧越出边界
+                    if x1 + 1 - size < 0:
+                        left = random.randint(0, int(x0))
+
+                    # 如果顶点下侧越出边界
+                    if y1 + 1 - size < 0:
+                        top = random.randint(0, int(y0))
+                    
+                    # 不满足以上任何情况
+                    if x1 - x0 <= size and x1 + 1 >= size:
+                        left = random.randint(int(x1) + 1 - size, int(x0) - 1)
+
+                    if y1 - y0 <= size and y1 + 1 >= size:
+                        top = random.randint(int(y1) + 1 - size, int(y0) - 1)
+
+                    # 开始裁剪 正样本
+                    # 如果横着越出边界
+                    if left + size > value[i][image_width]:
+                        left = value[i][image_width] - size
+
+                    # 竖着越出边界
+                    if top + size > value[i][image_height]:
+                        top = value[i][image_height] - size
+                    
+                    region = im.crop((left, top, left + size, top + size))
+                    # P 表示正样本
+                    region.save('cut_pic/' + 'P_' + str(j) + '_' + value[i][name])
+                    dict_p['name'] = 'P_' + str(j) + '_' + value[i][name]
+                    dict_p['positive'] = True
+                    dict_p['category'] = key
+                    # 保留残缺区域的相对位置
+                    dict_p['bbox'] = [
+                        round(x0 - left, 2), 
+                        round(y0 - top, 2), 
+                        round(x1 - left, 2), 
+                        round(y1 - top, 2)
+                    ]
+                    ls.append(dict_p)
+                print()
+                    # 保存负样本
+                    # dict_n = {}
+
+    return ls
 
 
 if __name__ == "__main__":
-    pass
+
+    JSONPATH = '../data/tile_round1_train_20201231/train_annos.json'
+    DATAPATH = "../data/tile_round1_train_20201231/train_imgs/"
+
+    # 每个类选择 10 张图片
+    sample_num = 10
+    # 选择要裁剪的图片
+    selected = select_pic(sample_num=sample_num, json_path=JSONPATH,
+                          data_path=DATAPATH, all=False)
+
+    # 4854.41, 4204.24, 4343, 4203, 
+    # ../data/tile_round1_train_20201231/train_imgs/218_26_t20201124102634809_CAM1.jpg
+    # 获取数据正确
+    with open('test.json', 'w') as f:
+        json.dump(selected, f, indent=4)
+
+    # 正负样本各裁剪几张
+    cut_num = 3
+    # 裁剪的尺寸 [size X size]
+    size = 512
+    # 裁剪得到的样本
+    json_dict = sample(selected, cut_num=cut_num, size=size,
+                     json_path=JSONPATH, data_path=DATAPATH)
+
+    # 保存 json
+    with open('cut_pic/data_json.json', 'w') as f:
+        json.dump(json_dict, f, indent=4)
