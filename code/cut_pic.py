@@ -56,6 +56,7 @@ def sample(selected, cut_num, size, json_path, data_path):
                 for j in range(cut_num):
                     # 保存正样本
                     dict_p = {}
+                    # 以 top 和 left 为起点进行裁剪
                     left, top = None, None
                     # 从 [left, top] 开始裁剪
                     # 裁剪大小为 [left->left+size, top->top+size]
@@ -97,6 +98,10 @@ def sample(selected, cut_num, size, json_path, data_path):
                     dict_p['positive'] = True
                     dict_p['category'] = key
                     # 保留残缺区域的相对位置
+                    assert 0 <= x0 - left <= size
+                    assert 0 <= y0 - top <= size
+                    assert 0 <= x1 - left <= size
+                    assert 0 <= y1 - top <= size
                     dict_p['bbox'] = [
                         round(x0 - left, 2), 
                         round(y0 - top, 2), 
