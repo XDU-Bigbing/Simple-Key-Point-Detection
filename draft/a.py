@@ -84,6 +84,10 @@ import json
 
 path = '../data/train_annos.json'
 
+max_x, max_y = 512, 512
+ave_x, ave_y = 0, 0
+cnt_x, cnt_y = 0, 0
+
 with open(path, 'r') as f:
     data_dict = json.load(f)
     for i in data_dict:
@@ -91,10 +95,19 @@ with open(path, 'r') as f:
             print('x error', i['name'], sep=', ')
         if i['bbox'][1] >= i['bbox'][3]:
             print('y error', i['name'], sep=', ')
-        if i['bbox'][3] - i['bbox'][1] >= 512:
-            print('y huge', i['name'], sep=', ')
+        if i['bbox'][3] - i['bbox'][1] >= max_x:
+            max_y = i['bbox'][3] - i['bbox'][1]
+        else:
+            ave_y += i['bbox'][3] - i['bbox'][1]
+            cnt_y += 1
         if i['bbox'][2] - i['bbox'][0] >= 512:
-            print('x huge', i['name'], sep=', ')
+            max_x = i['bbox'][2] - i['bbox'][0]
+        else:
+            ave_x += i['bbox'][2] - i['bbox'][0]
+            cnt_x += 1
+
+print(max_x, max_y, sep=', ')
+print(ave_x / cnt_x, ave_y / cnt_y, sep=', ')
 
 # x huge, 220_67_t20201124133440453_CAM3.jpg
 # x huge, 233_116_t20201127105036415_CAM2.jpg
