@@ -80,34 +80,34 @@
 # d['a'] = [1, 2, 3 ,4]
 # print(d)
 
-import json
+# import json
 
-path = '../data/train_annos.json'
+# path = '../data/train_annos.json'
 
-max_x, max_y = 512, 512
-ave_x, ave_y = 0, 0
-cnt_x, cnt_y = 0, 0
+# max_x, max_y = 512, 512
+# ave_x, ave_y = 0, 0
+# cnt_x, cnt_y = 0, 0
 
-with open(path, 'r') as f:
-    data_dict = json.load(f)
-    for i in data_dict:
-        if i['bbox'][0] >= i['bbox'][2]:
-            print('x error', i['name'], sep=', ')
-        if i['bbox'][1] >= i['bbox'][3]:
-            print('y error', i['name'], sep=', ')
-        if i['bbox'][3] - i['bbox'][1] >= max_x:
-            max_y = i['bbox'][3] - i['bbox'][1]
-        else:
-            ave_y += i['bbox'][3] - i['bbox'][1]
-            cnt_y += 1
-        if i['bbox'][2] - i['bbox'][0] >= 512:
-            max_x = i['bbox'][2] - i['bbox'][0]
-        else:
-            ave_x += i['bbox'][2] - i['bbox'][0]
-            cnt_x += 1
+# with open(path, 'r') as f:
+#     data_dict = json.load(f)
+#     for i in data_dict:
+#         if i['bbox'][0] >= i['bbox'][2]:
+#             print('x error', i['name'], sep=', ')
+#         if i['bbox'][1] >= i['bbox'][3]:
+#             print('y error', i['name'], sep=', ')
+#         if i['bbox'][3] - i['bbox'][1] >= max_x:
+#             max_y = i['bbox'][3] - i['bbox'][1]
+#         else:
+#             ave_y += i['bbox'][3] - i['bbox'][1]
+#             cnt_y += 1
+#         if i['bbox'][2] - i['bbox'][0] >= 512:
+#             max_x = i['bbox'][2] - i['bbox'][0]
+#         else:
+#             ave_x += i['bbox'][2] - i['bbox'][0]
+#             cnt_x += 1
 
-print(max_x, max_y, sep=', ')
-print(ave_x / cnt_x, ave_y / cnt_y, sep=', ')
+# print(max_x, max_y, sep=', ')
+# print(ave_x / cnt_x, ave_y / cnt_y, sep=', ')
 
 # x huge, 220_67_t20201124133440453_CAM3.jpg
 # x huge, 233_116_t20201127105036415_CAM2.jpg
@@ -151,3 +151,25 @@ print(ave_x / cnt_x, ave_y / cnt_y, sep=', ')
 # y huge, 245_87_t20201128142225571_CAM1.jpg
 # x huge, 253_40_t20201130123650600_CAM2.jpg
 # y huge, 245_23_t20201128140657791_CAM2.jpg
+
+# import json
+
+# d = {}
+
+# with open('instances_val2017.json', 'r') as f:
+#     d = json.load(f)
+
+# with open('instances_val2017.json', 'w') as f:
+#     json.dump(d, f, indent=4)
+
+# d = {}
+# print(d['a'])
+
+# a = b = 'asdasd'
+
+# print(a, b)
+
+def t():
+    return 1
+
+t()

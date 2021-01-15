@@ -115,7 +115,9 @@ def sample(selected, cut_num, size, json_path, data_path):
 
 
 def generate_mask(json_path, data_path, colors, size):
-
+    '''
+    对标注的异常区域生成掩码文件
+    '''
     with open(json_path, 'r') as f:
         d = json.load(f)
         # 遍历图片
@@ -124,6 +126,7 @@ def generate_mask(json_path, data_path, colors, size):
             im = Image.new('RGB', (size, size), colors['background'])
             x0, y0 = int(d[i]['bbox'][0]), int(d[i]['bbox'][1])
             x1, y1 = int(d[i]['bbox'][2]), int(d[i]['bbox'][3])
+            # 对异常区域创建矩形 作为掩码
             im1 = Image.new('RGB', (x1-x0, y1-y0), colors[d[i]['category']])
             im.paste(im1, (x0, y0))
             im.save('cut_pic/masks/' + 'Mask_' + d[i]['name'])
@@ -140,9 +143,7 @@ if __name__ == "__main__":
     selected = select_pic(sample_num=sample_num, json_path=JSONPATH,
                           data_path=DATAPATH, all=False)
 
-    # 4854.41, 4204.24, 4343, 4203, 
-    # ../data/tile_round1_train_20201231/train_imgs/218_26_t20201124102634809_CAM1.jpg
-    # 获取数据正确
+    # 获取随机选择的数据并保存
     with open('test.json', 'w') as f:
         json.dump(selected, f, indent=4)
 
@@ -161,6 +162,7 @@ if __name__ == "__main__":
     # 生成 mask 图片
     JSONPATH = 'cut_pic/data_json.json'
     DATAPATH = "cut_pic/"
+    # 每个类对应不同的颜色
     colors = {
         'background': '#FFFFFF',
         '1': '#FF0000',

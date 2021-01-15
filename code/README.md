@@ -1,6 +1,7 @@
 # 文件解释
 
 - `data.py`：加载数据
+- `coco.py`：制作 `COCO` 数据的 `json` 文件
 - `utils.py`：小工具
 - `train.py`：主文件
 - `output.txt`：日志输出文件
