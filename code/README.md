@@ -1,14 +1,10 @@
 # 文件解释
 
-- `data.py`：加载数据
+- `data.py`：加载数据的类
 - `coco.py`：制作 `COCO` 数据的 `json` 文件
 - `utils.py`：小工具
-- `train.py`：主文件
-- `output.txt`：日志输出文件
 - `cut_pic.py`：将图片切成 `512 X 512` 均匀大小，并生成缺陷区域的 `mask`
-- `model_test.py`：临时的模型训练文件
-- `cut_pic`：文件夹，里面有数据和 `mask` 图片
-- `view`：文件夹，将瑕疵数据进行红色边框标注，观察结果
+- `view.py`：标注图片的异常区域，观察结果的图片
 
 # 注意
 

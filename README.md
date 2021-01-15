@@ -11,8 +11,9 @@
 
 - `conda activate GPU-info`
 - `cd 1307/TianChi/code`
+- `python view.py` （项目无关）
+- `python cut_pic.py` （项目无关）
 - `python coco.py`
-- `python train.py`
 
 # 项目结构
 
@@ -28,6 +29,8 @@ Tianchi
 |            |-----instances_trainval.json   
 |      |-----trainval /                       题目的训练数据
 |            |-----*.jpg
+|      |-----test /                           题目的测试数据
+|      |     |-----*.jpg
 |-----CUT_PIC /                               切割的图片
 |            |-----data.json                  表明切割数据的 json
 |            |-----imgs /                     切割的图片
