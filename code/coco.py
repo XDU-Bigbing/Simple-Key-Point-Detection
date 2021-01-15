@@ -11,34 +11,14 @@ Copyright 2020 - 2021 XDU, XDU
 Description: 制作 COCO 数据集的 json
 '''
 
-import json
+import json, utils
 
 
-def get_image_id(json_path):
-    '''
-    # 生成每一个图片的唯一 id 
-    # 图片名相同，id 相同
-    '''
-    cnt = 1
-    # 图片 id 的保存
-    image_id = {}
-    # train_data path 的路径
-    with open('trainval/data_json.json', 'r') as f:
-        d = json.load(f)
-        for i in range(len(d)):
-            if d[i]['name'] not in image_id.keys():
-                image_id[d[i]['name']] = cnt
-                cnt += 1
-
-    print('image id number is {}'.format(len(image_id.keys())))
-    return image_id
-
-
-def make_json(image_id, cnt, json_path, data_path):
+def make_json(image_id, cnt, json_path, data_path, save_path):
     '''
     制作 COCO 数据的 json
     '''
-    with open('trainval/data_json.json', 'r') as f:
+    with open(json_path, 'r') as f:
         d = json.load(f)
         # 保存的结果
         save_dict = {}
@@ -94,15 +74,17 @@ def make_json(image_id, cnt, json_path, data_path):
         save_dict['images'] = images
         save_dict['annotations'] = annotations
         save_dict['categories'] = classes
-        with open(JSONPATH+'instances_trainval.json', 'w') as f:
+        with open(save_path, 'w') as f:
             json.dump(save_dict, f, indent=4)
 
 
 if __name__ == "__main__":
     
-    DATAPATH = 'trainval/'
-    JSONPATH = 'annotations/'
+    DATAPATH = 'data/trainval/'
+    JSONPATH = 'data/train_annos.json'
+    SAVEPATH = 'data/annotations/instances_trainval.json'
     # 盒子的 id 全局唯一
     cnt = 1
-    image_id = get_image_id(json_path=JSONPATH)
-    make_json(image_id=image_id, cnt=cnt, json_path=JSONPATH, data_path=DATAPATH)
+    image_id = utils.get_image_id(json_path=JSONPATH)
+    make_json(image_id=image_id, cnt=cnt, json_path=JSONPATH, 
+              data_path=DATAPATH, save_path=SAVEPATH)
