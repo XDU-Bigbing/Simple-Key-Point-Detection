@@ -20,11 +20,16 @@
 Tianchi
 |-----coco.py
 |-----utils.py
-|-----data/
+|-----data /
 |      |-----train_annos.json
-|      |-----annotations/
+|      |-----annotations /
 |            |-----instances_trainval.json
-|      |-----trainval
+|      |-----trainval /
 |            |-----*.jpg
-
+|     CUT_PIC /
+|            |-----data.json
+|            |-----imgs /
+|                    |----- *.jpg
+|            |-----masks /
+|                    |----- *.jpg
 ```
