@@ -12,8 +12,8 @@ Description: 独立于项目，每个类随机选择 10 张图片，标注异常
 import utils
 from PIL import Image, ImageDraw
 
-JSONPATH = '../data/tile_round1_train_20201231/train_annos.json'
-DATAPATH = "../data/tile_round1_train_20201231/train_imgs/"
+JSONPATH = 'data/train_annos.json'
+DATAPATH = "data/trainval/"
 
 # 进度条计数器
 cnt = 0

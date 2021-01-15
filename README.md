@@ -18,18 +18,22 @@
 
 ```
 Tianchi
-|-----coco.py
-|-----utils.py
-|-----data /
-|      |-----train_annos.json
-|      |-----annotations /
-|            |-----instances_trainval.json
-|      |-----trainval /
+|-----coco.py                                 制作 coco 数据的 json
+|-----utils.py                                小工具
+|-----cut_pic.py                              切割图片
+|-----view.py                                 标注图片的异常区域，观察
+|-----data /                                  训练数据的文件夹
+|      |-----train_annos.json                 题目提供的 json
+|      |-----annotations /                    制作的 coco json
+|            |-----instances_trainval.json   
+|      |-----trainval /                       题目的训练数据
 |            |-----*.jpg
-|     CUT_PIC /
-|            |-----data.json
-|            |-----imgs /
+|-----CUT_PIC /                               切割的图片
+|            |-----data.json                  表明切割数据的 json
+|            |-----imgs /                     切割的图片
 |                    |----- *.jpg
-|            |-----masks /
+|            |-----masks /                    切割图片异常区域的 mask
 |                    |----- *.jpg
+|-----view /                                  标注图片的异常区域，观察结果的图片
+|      |----- *.jpg
 ```
