@@ -11,10 +11,20 @@
 
 - `conda activate GPU-info`
 - `cd 1307/TianChi/code`
+- `python coco.py`
 - `python train.py`
 
 # 项目结构
 
-- `code`：代码文件
-- `data`：数据文件，文件太太多不上传
-- `draft`：打草稿的代码，实际项目中并不使用
+```
+Tianchi
+|-----coco.py
+|-----utils.py
+|-----data/
+|      |-----train_annos.json
+|      |-----annotations/
+|            |-----instances_trainval.json
+|      |-----trainval
+|            |-----*.jpg
+
+```
