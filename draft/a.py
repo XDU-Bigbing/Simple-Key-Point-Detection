@@ -203,20 +203,20 @@
 #     for i in items:
 #         print('----')
 
-# import json
-# d = [
-#     {
-#         'name': '123',
-#         'width': 12
-#     },
-#     {
-#         'name': '123',
-#         'width': 56
-#     }
-# ]
+import json
+d = [
+    {
+        'name': '123',
+        'width': 12
+    },
+    {
+        'name': '123',
+        'width': 56
+    }
+]
 
-# with open('a.json', 'w') as f:
-#     json.dump(d, f, indent=4)
+with open('a.json', 'w') as f:
+    json.dump(d, f, indent=4)
 
 # with open('a.json', 'r') as f:
 #     d = json.load(f)
@@ -267,5 +267,5 @@
 # for i in range(11, 110, 11):
 #     print(int(str(i), 16))
 
-a = 'asdasdihbaesd.jpg'
-print(a[0:-4])
+# a = 'asdasdihbaesd.jpg'
+# print(a[0:-4])

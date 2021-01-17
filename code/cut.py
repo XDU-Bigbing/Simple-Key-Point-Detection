@@ -8,7 +8,7 @@ Copyright 2020 - 2021 XDU, XDU
 -----------
 Description: 切分原始数据，原始数据怎么切，mask 数据就怎么切
 '''
-import json, random
+import os, json, random
 from PIL import Image
 from itertools import groupby
 from operator import itemgetter
@@ -61,6 +61,9 @@ def cut_pic(json_path, save_path, cut_num, size):
             x0, y0 = box[0], box[1]
             x1, y1 = box[2], box[3]
             for j in range(cut_num):
+                if os.path.exists(save_path + 'images/' + name[0:-4] + '_' + str(j) + '.jpg'):
+                    cnt += 1
+                    continue
                 # 保存的 json
                 dict_p = {}
                 # 以 top 和 left 为起点进行裁剪
@@ -84,10 +87,16 @@ def cut_pic(json_path, save_path, cut_num, size):
                 
                 # 不满足以上任何情况
                 if x1 - x0 <= size and x1 + 1 >= size:
-                    left = random.randint(int(x1) + 1 - size, int(x0) - 1)
+                    a, b = int(x1) + 1 - size, int(x0) - 1
+                    while a >= b:
+                        a -= 1
+                    left = random.randint(a, b)
 
                 if y1 - y0 <= size and y1 + 1 >= size:
-                    top = random.randint(int(y1) + 1 - size, int(y0) - 1)
+                    a, b = int(y1) + 1 - size, int(y0) - 1
+                    while a >= b:
+                        a -= 1
+                    top = random.randint(a, b)
 
                 # 开始裁剪 正样本
                 # 如果横着越出边界
