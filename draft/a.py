@@ -177,31 +177,31 @@
 
 # print(a < b)
 
-from operator import itemgetter
-from itertools import groupby
+# from operator import itemgetter
+# from itertools import groupby
 
 
-# 创建记录
-records = [
-    {'address': '5412 N CLARK', 'date': '07/01/2012'},
-    {'address': '5148 N CLARK', 'date': '07/04/2012'},
-    {'address': '5800 E 58TH', 'date': '07/02/2012'},
-    {'address': '2122 N CLARK', 'date': '07/03/2012'},
-    {'address': '5645 N RAVENSWOOD', 'date': '07/02/2012'},
-    {'address': '1060 W ADDISON', 'date': '07/02/2012'},
-    {'address': '4801 N BROADWAY', 'date': '07/01/2012'},
-    {'address': '1039 W GRANVILLE', 'date': '07/04/2012'},
-]
+# # 创建记录
+# records = [
+#     {'address': '5412 N CLARK', 'date': '07/01/2012'},
+#     {'address': '5148 N CLARK', 'date': '07/04/2012'},
+#     {'address': '5800 E 58TH', 'date': '07/02/2012'},
+#     {'address': '2122 N CLARK', 'date': '07/03/2012'},
+#     {'address': '5645 N RAVENSWOOD', 'date': '07/02/2012'},
+#     {'address': '1060 W ADDISON', 'date': '07/02/2012'},
+#     {'address': '4801 N BROADWAY', 'date': '07/01/2012'},
+#     {'address': '1039 W GRANVILLE', 'date': '07/04/2012'},
+# ]
 
-# 先按照给定字段将数据排序
-records.sort(key=itemgetter('date'))
+# # 先按照给定字段将数据排序
+# records.sort(key=itemgetter('date'))
 
-# 分组，一次迭代查找连续的相同值，返回一个值和一个迭代器对象
-for date, items in groupby(records, key=itemgetter('date')):
-    for i in items:
-        print(' ', i['address'], i['date'])
-    for i in items:
-        print('----')
+# # 分组，一次迭代查找连续的相同值，返回一个值和一个迭代器对象
+# for date, items in groupby(records, key=itemgetter('date')):
+#     for i in items:
+#         print(' ', i['address'], i['date'])
+#     for i in items:
+#         print('----')
 
 # import json
 # d = [
@@ -222,3 +222,50 @@ for date, items in groupby(records, key=itemgetter('date')):
 #     d = json.load(f)
 #     for i in d:
 #         print(i)
+
+# from PIL import Image
+# import numpy as np
+
+# colors = {
+#     'background': '#000000',
+#     '1': '#110000',
+#     '2': '#002200',
+#     '3': '#000033',
+#     '4': '#445500',
+#     '5': '#660077',
+#     '6': '#008899',
+# }
+
+
+# im = Image.new('RGB', (3, 3), colors['5'])
+# # im1 = Image.new('RGB', (2, 2), colors['6'])
+# # im.paste(im1, (0, 0))
+# im.save('1.png')
+# mask = Image.open('1.png')
+# mask = np.array(mask)
+# print(mask)
+# obj_ids = np.unique(mask)
+# for i in obj_ids:
+#     print(str(i))
+# print(obj_ids, sep='  ')
+
+    # print(value, mask, sep=', ')
+# print(int('66', 16))
+
+# d = {
+#     '17': 1,
+#     '34': 2,
+#     '51': 3,
+#     '68': 4,
+#     '85': 4,
+#     '102': 5,
+#     '119': 5,
+#     '136': 6,
+#     '153': 6
+# }
+
+# for i in range(11, 110, 11):
+#     print(int(str(i), 16))
+
+a = 'asdasdihbaesd.jpg'
+print(a[0:-4])

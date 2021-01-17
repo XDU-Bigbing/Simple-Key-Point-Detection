@@ -8,7 +8,7 @@ Copyright 2020 - 2021 XDU, XDU
 -----------
 Description: https://github.com/XDU-Bigbing/Simple-Key-Point-Detection/issues/1#issuecomment-761743786
 '''
-import json, sys
+import json
 from PIL import Image
 from itertools import groupby
 from operator import itemgetter
@@ -51,12 +51,12 @@ if __name__ == "__main__":
     # 每个类对应不同的颜色
     colors = {
         'background': '#000000',
-        '1': '#FF0000',
-        '2': '#00FF00',
-        '3': '#0000FF',
-        '4': '#FFFF00',
-        '5': '#FF00FF',
-        '6': '#00FFFF',
+        '1': '#110000',
+        '2': '#002200',
+        '3': '#000033',
+        '4': '#445500',
+        '5': '#660077',
+        '6': '#008899',
     }
 
     generate_mask(json_path=JSONPATH, save_path=SAVEPATH, colors=colors)
