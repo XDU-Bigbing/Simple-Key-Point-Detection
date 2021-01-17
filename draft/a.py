@@ -87,27 +87,25 @@
 # max_x, max_y = 512, 512
 # ave_x, ave_y = 0, 0
 # cnt_x, cnt_y = 0, 0
+# min_x, min_y = 512, 512
 
 # with open(path, 'r') as f:
 #     data_dict = json.load(f)
 #     for i in data_dict:
-#         if i['bbox'][0] >= i['bbox'][2]:
-#             print('x error', i['name'], sep=', ')
-#         if i['bbox'][1] >= i['bbox'][3]:
-#             print('y error', i['name'], sep=', ')
-#         if i['bbox'][3] - i['bbox'][1] >= max_x:
+#         # if i['bbox'][0] >= i['bbox'][2]:
+#         #     print('x error', i['name'], sep=', ')
+#         # if i['bbox'][1] >= i['bbox'][3]:
+#         #     print('y error', i['name'], sep=', ')
+#         if i['bbox'][3] - i['bbox'][1] >= max_y:
 #             max_y = i['bbox'][3] - i['bbox'][1]
-#         else:
-#             ave_y += i['bbox'][3] - i['bbox'][1]
-#             cnt_y += 1
-#         if i['bbox'][2] - i['bbox'][0] >= 512:
+#         if i['bbox'][3] - i['bbox'][1] < min_y:
+#             min_y = i['bbox'][3] - i['bbox'][1]
+#         if i['bbox'][2] - i['bbox'][0] >= max_x:
 #             max_x = i['bbox'][2] - i['bbox'][0]
-#         else:
-#             ave_x += i['bbox'][2] - i['bbox'][0]
-#             cnt_x += 1
+#         if i['bbox'][2] - i['bbox'][0] < min_x:
+#             min_x = i['bbox'][2] - i['bbox'][0]
 
-# print(max_x, max_y, sep=', ')
-# print(ave_x / cnt_x, ave_y / cnt_y, sep=', ')
+# print(max_x, max_y, min_x, min_y, sep=', ')
 
 # x huge, 220_67_t20201124133440453_CAM3.jpg
 # x huge, 233_116_t20201127105036415_CAM2.jpg
@@ -169,7 +167,58 @@
 
 # print(a, b)
 
-def t():
-    return 1
+# def t():
+#     return 1
 
-t()
+# t()
+
+# a = [1, 2, 3]
+# b = [3, 4, 5]
+
+# print(a < b)
+
+from operator import itemgetter
+from itertools import groupby
+
+
+# 创建记录
+records = [
+    {'address': '5412 N CLARK', 'date': '07/01/2012'},
+    {'address': '5148 N CLARK', 'date': '07/04/2012'},
+    {'address': '5800 E 58TH', 'date': '07/02/2012'},
+    {'address': '2122 N CLARK', 'date': '07/03/2012'},
+    {'address': '5645 N RAVENSWOOD', 'date': '07/02/2012'},
+    {'address': '1060 W ADDISON', 'date': '07/02/2012'},
+    {'address': '4801 N BROADWAY', 'date': '07/01/2012'},
+    {'address': '1039 W GRANVILLE', 'date': '07/04/2012'},
+]
+
+# 先按照给定字段将数据排序
+records.sort(key=itemgetter('date'))
+
+# 分组，一次迭代查找连续的相同值，返回一个值和一个迭代器对象
+for date, items in groupby(records, key=itemgetter('date')):
+    for i in items:
+        print(' ', i['address'], i['date'])
+    for i in items:
+        print('----')
+
+# import json
+# d = [
+#     {
+#         'name': '123',
+#         'width': 12
+#     },
+#     {
+#         'name': '123',
+#         'width': 56
+#     }
+# ]
+
+# with open('a.json', 'w') as f:
+#     json.dump(d, f, indent=4)
+
+# with open('a.json', 'r') as f:
+#     d = json.load(f)
+#     for i in d:
+#         print(i)
