@@ -144,7 +144,7 @@ if __name__ == "__main__":
                           data_path=DATAPATH, all=False)
 
     # 正负样本各裁剪几张
-    cut_num = 3
+    cut_num = 5
     # 裁剪的尺寸 [size X size]
     size = 512
     # 裁剪得到的样本
@@ -160,7 +160,7 @@ if __name__ == "__main__":
     DATAPATH = SAVEPATH + 'imgs/'
     # 每个类对应不同的颜色
     colors = {
-        'background': '#FFFFFF',
+        'background': '#000000',
         '1': '#FF0000',
         '2': '#00FF00',
         '3': '#0000FF',

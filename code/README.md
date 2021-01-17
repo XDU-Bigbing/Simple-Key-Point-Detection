@@ -3,8 +3,9 @@
 - `data.py`：加载数据的类
 - `coco.py`：制作 `COCO` 数据的 `json` 文件
 - `utils.py`：小工具
-- `cut_pic.py`：将图片切成 `512 X 512` 均匀大小，并生成缺陷区域的 `mask`
 - `view.py`：标注图片的异常区域，观察结果的图片
+- `view_cut_pic.py`：将上个代码观察的图片切成 `512 X 512` 均匀大小，并生成缺陷区域的 `mask`
+- `mask.py`：制作图片的 `mask` 数据
 
 # 注意
 
