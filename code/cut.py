@@ -54,12 +54,13 @@ def cut_pic(json_path, save_path, cut_num, size):
     mask_path = 'maskdata/masks/'
 
     for item in d:
+
         name = item['name']
         # 打开原始图片
         image = Image.open(data_path + name).convert("RGB")
         # 打开 mask 图片
-        height, width = item['image_height'], item['image_width']
         mask = Image.open(mask_path + 'Mask_' + name).convert("RGB")
+        height, width = item['image_height'], item['image_width']
         for cate, box in zip(item['category'], item['bbox']):
             # 记录这是第几个盒子
             idx = 0
@@ -71,7 +72,7 @@ def cut_pic(json_path, save_path, cut_num, size):
                 # 图片命名：图片名_第几张_类别_第几个盒子，防止覆盖文件
                 image_path = save_path + 'images/' + name[0:-4] + '_' + str(j) \
                              + '_' + str(cate) + '_' + str(idx) + '.jpg'
-                mask_path = save_path + 'masks/' + name[0:-4] + '_' + str(j) \
+                mask_image_path = save_path + 'masks/' + name[0:-4] + '_' + str(j) \
                             + '_' + str(cate) + '_' + str(idx) + '.jpg'
                 # 如果存在就不用裁剪，省得浪费时间
                 if os.path.exists(image_path):
@@ -123,7 +124,7 @@ def cut_pic(json_path, save_path, cut_num, size):
                 region = image.crop((left, top, left + size, top + size))
                 mask_region = mask.crop((left, top, left + size, top + size))
                 region.save(image_path)
-                mask_region.save(mask_path)
+                mask_region.save(mask_image_path)
                 dict_p['category'] = cate
                 # 保留残缺区域的相对位置
                 dict_p['bbox'] = [
@@ -134,7 +135,8 @@ def cut_pic(json_path, save_path, cut_num, size):
                 ]
                 ls.append(dict_p)
             idx += 1
-        print(cnt)
+
+        print(cnt, '/', 30460)
         cnt += 1
 
     with open(save_path + 'cut_data.json', 'w') as f:
