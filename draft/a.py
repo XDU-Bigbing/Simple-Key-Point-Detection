@@ -203,25 +203,25 @@
 #     for i in items:
 #         print('----')
 
-import json
-d = [
-    {
-        'name': '123',
-        'width': 12
-    },
-    {
-        'name': '123',
-        'width': 56
-    }
-]
+# import json
+# d = [
+#     {
+#         'name': '123',
+#         'width': 12
+#     },
+#     {
+#         'name': '12',
+#         'width': 56
+#     }
+# ]
 
-with open('a.json', 'w') as f:
-    json.dump(d, f, indent=4)
+# with open('a.json', 'w') as f:
+#     json.dump(d, f, indent=4)
 
-# with open('a.json', 'r') as f:
-#     d = json.load(f)
-#     for i in d:
-#         print(i)
+# for i in range(10):
+#     with open('a.json', 'r') as f:
+#         d = json.load(f)
+#         print(d)
 
 # from PIL import Image
 # import numpy as np
@@ -269,3 +269,14 @@ with open('a.json', 'w') as f:
 
 # a = 'asdasdihbaesd.jpg'
 # print(a[0:-4])
+
+import json
+d = {}
+with open('../data/train_annos.json') as f:
+    d = json.load(f)
+    print(len(d))
+# d1 = {}
+# with open('../data/train_annos.json') as f:
+#     d1 = json.load(f)
+
+# print(d == d1)
