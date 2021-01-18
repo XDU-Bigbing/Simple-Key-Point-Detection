@@ -75,7 +75,7 @@ def cut_pic(json_path, save_path, cut_num, size):
                             + '_' + str(cate) + '_' + str(idx) + '.jpg'
                 # 如果存在就不用裁剪，省得浪费时间
                 if os.path.exists(image_path):
-                    print(image_path)
+                    # print(image_path)
                     continue
                 # 保存的 json
                 dict_p = {}

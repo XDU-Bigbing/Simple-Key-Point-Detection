@@ -272,9 +272,13 @@
 
 import json
 d = {}
+a = set()
 with open('../data/train_annos.json') as f:
     d = json.load(f)
     print(len(d))
+for i in d:
+    a.add(i['name'])
+print(len(a))
 # d1 = {}
 # with open('../data/train_annos.json') as f:
 #     d1 = json.load(f)

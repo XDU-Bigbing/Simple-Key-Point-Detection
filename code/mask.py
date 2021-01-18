@@ -8,7 +8,8 @@ Copyright 2020 - 2021 XDU, XDU
 -----------
 Description: https://github.com/XDU-Bigbing/Simple-Key-Point-Detection/issues/1#issuecomment-761743786
 '''
-import json
+import json, os
+import numpy as np
 from PIL import Image
 from itertools import groupby
 from operator import itemgetter
@@ -24,8 +25,13 @@ def generate_mask(json_path, save_path, colors):
         # 有多个图片，排序
         d_sort = sorted(d, key=itemgetter('name', 'category', 'bbox'))
         for name, items in groupby(d_sort, key=itemgetter('name')):
+            if os.path.exists(save_path + 'Mask_' + name):
+                cnt += 1
+                continue
             height, width = None, None
             # 只能遍历一次
+            # 变量作用域
+            im = Image.new('RGB', (10, 10), colors['background'])
             for pic in items:
                 if height is None and width is None:
                     height, width = pic['image_height'], pic['image_width']
@@ -36,8 +42,9 @@ def generate_mask(json_path, save_path, colors):
                 # 对异常区域创建矩形 作为掩码
                 im1 = Image.new('RGB', (x1-x0, y1-y0), colors[str(pic['category'])])
                 im.paste(im1, (x0, y0))
-                print(str(pic['category']), end=', ')
-
+            # 太慢了
+            # num = np.unique(np.array(im))
+            # assert num.size > 1, 'mask only have background'
             im.save(save_path + 'Mask_' + name)
             print("{}%".format(cnt))
             cnt += 1
