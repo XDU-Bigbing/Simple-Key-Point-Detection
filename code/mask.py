@@ -25,7 +25,7 @@ def generate_mask(json_path, save_path, colors):
         # 有多个图片，排序
         d_sort = sorted(d, key=itemgetter('name', 'category', 'bbox'))
         for name, items in groupby(d_sort, key=itemgetter('name')):
-            if os.path.exists(save_path + 'Mask_' + name):
+            if os.path.exists(save_path + 'Mask_' + name[:-4] + '.png'):
                 cnt += 1
                 continue
             height, width = None, None
@@ -45,7 +45,11 @@ def generate_mask(json_path, save_path, colors):
             # 太慢了
             # num = np.unique(np.array(im))
             # assert num.size > 1, 'mask only have background'
-            im.save(save_path + 'Mask_' + name)
+            # png 保留原始颜色
+            im.save(save_path + 'Mask_' + name[:-4] + '.png')
+            if cnt == 4:
+                a = np.array(im)
+                print(np.unique(a))
             print("{}%".format(cnt))
             cnt += 1
 
@@ -67,3 +71,4 @@ if __name__ == "__main__":
     }
 
     generate_mask(json_path=JSONPATH, save_path=SAVEPATH, colors=colors)
+    print('Fucking End!!!')
