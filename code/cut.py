@@ -76,6 +76,7 @@ def cut_pic(json_path, save_path, cut_num, size):
                             + '_' + str(cate) + '_' + str(idx) + '.jpg'
                 # 如果存在就不用裁剪，省得浪费时间
                 if os.path.exists(image_path):
+                    cnt += 1 / cut_num
                     # print(image_path)
                     continue
                 # 保存的 json
@@ -160,3 +161,5 @@ if __name__ == "__main__":
     # 目标区域的尺寸
     SIZE = 512
     cut_pic(json_path=JSONPATHSUM, save_path=SAVEPATH, cut_num=CUTNUM, size=SIZE)
+
+# 157001

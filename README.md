@@ -1,6 +1,6 @@
 # 题目背景
 
-[https://tianchi.aliyun.com/competition/entrance/531846/information](小目标的异常点检测)
+[小目标的异常点检测](https://tianchi.aliyun.com/competition/entrance/531846/information)，超乎我对神经网络实际项目的认知。
 
 ## 数据集
 
