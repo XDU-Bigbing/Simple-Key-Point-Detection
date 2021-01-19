@@ -270,17 +270,23 @@
 # a = 'asdasdihbaesd.jpg'
 # print(a[0:-4])
 
-import json
-d = {}
-a = set()
-with open('../data/train_annos.json') as f:
-    d = json.load(f)
-    print(len(d))
-for i in d:
-    a.add(i['name'])
-print(len(a))
+# import json
+# d = {}
+# a = set()
+# with open('../data/train_annos.json') as f:
+#     d = json.load(f)
+#     print(len(d))
+# for i in d:
+#     a.add(i['name'])
+# print(len(a))
 # d1 = {}
 # with open('../data/train_annos.json') as f:
 #     d1 = json.load(f)
 
 # print(d == d1)
+
+# import json
+# import pandas as pd
+
+# df = pd.read_json('a.json')
+# df.to_csv('a.csv', index = None)
