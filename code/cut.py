@@ -59,7 +59,7 @@ def cut_pic(json_path, save_path, cut_num, size):
         # 打开原始图片
         image = Image.open(data_path + name).convert("RGB")
         # 打开 mask 图片
-        mask = Image.open(mask_path + 'Mask_' + name).convert("RGB")
+        mask = Image.open(mask_path + 'Mask_' + name[0:-4] + '.png').convert("RGB")
         height, width = item['image_height'], item['image_width']
         for cate, box in zip(item['category'], item['bbox']):
             # 记录这是第几个盒子
@@ -71,9 +71,9 @@ def cut_pic(json_path, save_path, cut_num, size):
             for j in range(cut_num):
                 # 图片命名：图片名_第几张_类别_第几个盒子，防止覆盖文件
                 image_path = save_path + 'images/' + name[0:-4] + '_' + str(j) \
-                             + '_' + str(cate) + '_' + str(idx) + '.jpg'
+                             + '_' + str(cate) + '_' + str(idx) + '.png'
                 mask_image_path = save_path + 'masks/' + name[0:-4] + '_' + str(j) \
-                            + '_' + str(cate) + '_' + str(idx) + '.jpg'
+                            + '_' + str(cate) + '_' + str(idx) + '.png'
                 # 如果存在就不用裁剪，省得浪费时间
                 if os.path.exists(image_path):
                     cnt += 1 / cut_num
@@ -161,5 +161,5 @@ if __name__ == "__main__":
     # 目标区域的尺寸
     SIZE = 512
     cut_pic(json_path=JSONPATHSUM, save_path=SAVEPATH, cut_num=CUTNUM, size=SIZE)
-
+    print('Fucking end.')
 # 157001
