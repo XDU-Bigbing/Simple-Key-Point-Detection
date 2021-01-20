@@ -122,10 +122,32 @@ def cut_pic(json_path, save_path, cut_num, size):
                 if top + size > height:
                     top = height - size
 
+                # 判断裁剪区域和目标区域有无交集，没有交集就目标区域
+                if (x1 <= left and y1 <= top) or (x0 >= left + size and y1 <= top) or \
+                    (x1 <= left and y0 >= top + size) or (x0 >= left + size and y0 >= top + size):
+                    print('------In cut resion, no target------')
+                    if x1 <= left and y1 <= top:
+                        while x1 <= left and y1 <= top:
+                            left -= 5
+                            top -= 5
+                    elif x0 >= left + size and y1 <= top:
+                        while x0 >= left + size and y1 <= top:
+                            left += 5
+                            top -= 5
+                    elif x1 <= left and y0 >= top + size:
+                        while x1 <= left and y0 >= top + size:
+                            left -= 5
+                            top += 5
+                    elif x0 >= left + size and y0 >= top + size:
+                        while x0 >= left + size and y0 >= top + size:
+                            left += 5
+                            top += 5
+
                 region = image.crop((left, top, left + size, top + size))
                 mask_region = mask.crop((left, top, left + size, top + size))
                 region.save(image_path)
                 mask_region.save(mask_image_path)
+                dict_p['name'] = mask_image_path
                 dict_p['category'] = cate
                 # 保留残缺区域的相对位置
                 dict_p['bbox'] = [

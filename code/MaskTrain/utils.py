@@ -20,51 +20,70 @@ class SmoothedValue(object):
     def __init__(self, window_size=20, fmt=None):
         if fmt is None:
             fmt = "{median:.4f} ({global_avg:.4f})"
+        # 队列的用途不懂
         self.deque = deque(maxlen=window_size)
         self.total = 0.0
         self.count = 0
         self.fmt = fmt
 
+    # 更新队列
     def update(self, value, n=1):
         self.deque.append(value)
+        # count 队列的元素
         self.count += n
+        # 队列元素中的数值之和
         self.total += value * n
 
+    # 同步进程信息
     def synchronize_between_processes(self):
         """
         Warning: does not synchronize the deque!
         """
+        # 不支持并行直接返回
         if not is_dist_avail_and_initialized():
             return
+        # 支持并行的情况下
         t = torch.tensor([self.count, self.total], dtype=torch.float64, device='cuda')
+        # 用于同步进程，阻塞等待所有的进程进入
         dist.barrier()
+        # AllReduce通信方法获取多卡上的平均梯度，操作后每个卡上的每一个bit，t都相同
+        # t 是广播通信的输入和输出，就地操作
         dist.all_reduce(t)
+        # 转为列表
         t = t.tolist()
+        # [self.count, self.total]的 Tensor 转为列表，在取出前两个元素
         self.count = int(t[0])
         self.total = t[1]
 
+    # 装饰器，方法当属性用
     @property
+    # 返回中位数
     def median(self):
         d = torch.tensor(list(self.deque))
         return d.median().item()
 
     @property
+    # tensor 的平均值
     def avg(self):
         d = torch.tensor(list(self.deque), dtype=torch.float32)
         return d.mean().item()
 
     @property
+    # 不懂
     def global_avg(self):
         return self.total / self.count
 
     @property
+    # 队列的最大值 value
     def max(self):
         return max(self.deque)
 
     @property
+    # 取出刚压入队列的元素
     def value(self):
         return self.deque[-1]
 
+    # 键不存在时显示的东西
     def __str__(self):
         return self.fmt.format(
             median=self.median,
@@ -146,19 +165,29 @@ def reduce_dict(input_dict, average=True):
 
 class MetricLogger(object):
     def __init__(self, delimiter="\t"):
+        # defaultdict 字典
+        # 当键不存在时，打印 SmoothedValue 中提供的字符串
+        # 字典的值是 SmoothedValue 类型
         self.meters = defaultdict(SmoothedValue)
         self.delimiter = delimiter
 
     def update(self, **kwargs):
+        # 获取传入的参数
         for k, v in kwargs.items():
+            # 获取数值
             if isinstance(v, torch.Tensor):
                 v = v.item()
             assert isinstance(v, (float, int))
+            # SmoothedValue 类中
+            # 更新每一个键的队列？
             self.meters[k].update(v)
 
     def __getattr__(self, attr):
         if attr in self.meters:
             return self.meters[attr]
+        # self.__dict__ 函数额外添加的属性 或
+        # 类的属性与方法
+        # https://stackoverflow.com/questions/19907442/explain-dict-attribute
         if attr in self.__dict__:
             return self.__dict__[attr]
         raise AttributeError("'{}' object has no attribute '{}'".format(
@@ -170,12 +199,15 @@ class MetricLogger(object):
             loss_str.append(
                 "{}: {}".format(name, str(meter))
             )
+        # key value 打印 loss
         return self.delimiter.join(loss_str)
 
+    # 同步字典所有的值
     def synchronize_between_processes(self):
         for meter in self.meters.values():
             meter.synchronize_between_processes()
 
+    # 字典添加元素
     def add_meter(self, name, meter):
         self.meters[name] = meter
 
@@ -222,14 +254,20 @@ def collate_fn(batch):
     return tuple(zip(*batch))
 
 
+# 唤醒学习率衰减
 def warmup_lr_scheduler(optimizer, warmup_iters, warmup_factor):
 
+    # 设置每个参数的衰减次数
     def f(x):
+        # 传入的参数是 epoch ，大于 1000 衰减 1 次
         if x >= warmup_iters:
             return 1
         alpha = float(x) / warmup_iters
+        # 1000 - x + x / 1000
         return warmup_factor * (1 - alpha) + alpha
 
+    # 先执行 return 
+    # 对每一个参数设置初始化的学习率衰减次数通过函数 f
     return torch.optim.lr_scheduler.LambdaLR(optimizer, f)
 
 
@@ -256,12 +294,13 @@ def setup_for_distributed(is_master):
     __builtin__.print = print
 
 
+# 判断并行库是否支持，如果不支持，那么暴露任何接口
 def is_dist_avail_and_initialized():
     if not dist.is_available():
         return False
     if not dist.is_initialized():
         return False
-    return True
+    return False
 
 
 def get_world_size():

@@ -35,7 +35,7 @@ def generate_mask(json_path, save_path, colors):
             for pic in items:
                 if height is None and width is None:
                     height, width = pic['image_height'], pic['image_width']
-                    im = Image.new('RGB', (height, width), colors['background'])
+                    im = Image.new('RGB', (width, height), colors['background'])
                 # 按照 size 创建背景颜色的图片
                 x0, y0 = int(pic['bbox'][0]), int(pic['bbox'][1])
                 x1, y1 = int(pic['bbox'][2]), int(pic['bbox'][3])

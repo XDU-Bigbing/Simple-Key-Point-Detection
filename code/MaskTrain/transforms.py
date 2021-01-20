@@ -15,6 +15,9 @@ def _flip_coco_person_keypoints(kps, width):
 
 
 class Compose(object):
+    '''
+    t 是一组变换的操作，是列表里的元素
+    '''
     def __init__(self, transforms):
         self.transforms = transforms
 
@@ -25,16 +28,25 @@ class Compose(object):
 
 
 class RandomHorizontalFlip(object):
+    '''
+    随机翻转
+    image： torch.Tensor 类型
+    target：字典类型
+    '''
     def __init__(self, prob):
         self.prob = prob
 
     def __call__(self, image, target):
+        # 概率小于 0.5（指定参数） 时
         if random.random() < self.prob:
             height, width = image.shape[-2:]
+            # torch 的左右反转
             image = image.flip(-1)
             bbox = target["boxes"]
+            # 左右翻转后，纵坐标不受影响，需要变换横坐标
             bbox[:, [0, 2]] = width - bbox[:, [2, 0]]
             target["boxes"] = bbox
+            # masks 模式下，翻转
             if "masks" in target:
                 target["masks"] = target["masks"].flip(-1)
             if "keypoints" in target:

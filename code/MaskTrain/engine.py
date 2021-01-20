@@ -10,22 +10,29 @@ from coco_eval import CocoEvaluator
 import utils
 
 
+# 主文件中的训练
 def train_one_epoch(model, optimizer, data_loader, device, epoch, print_freq):
+    # 设置为训练模式
     model.train()
+    # 还没懂这是什么
     metric_logger = utils.MetricLogger(delimiter="  ")
+    # 添加一个 key 为 lr，值为 SmoothedValue 对象的元素
     metric_logger.add_meter('lr', utils.SmoothedValue(window_size=1, fmt='{value:.6f}'))
+    # 用途是？
     header = 'Epoch: [{}]'.format(epoch)
-
+    # 取消学习率衰减
     lr_scheduler = None
+
+    # 第一次循环时
     if epoch == 0:
         warmup_factor = 1. / 1000
         warmup_iters = min(1000, len(data_loader) - 1)
-
+        # 设置每个 epoch 的学习率衰减
         lr_scheduler = utils.warmup_lr_scheduler(optimizer, warmup_iters, warmup_factor)
 
     for images, targets in metric_logger.log_every(data_loader, print_freq, header):
         images = list(image.to(device) for image in images)
-        targets = [{k: v.to(device) for k, v in t.items()} for t in targets]
+        targets = [{k: v.to(device) for k, v in targets.items()}]
 
         loss_dict = model(images, targets)
 
