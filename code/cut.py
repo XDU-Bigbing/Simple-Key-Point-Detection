@@ -54,6 +54,7 @@ def cut_pic(json_path, save_path, cut_num, size):
     data_path = 'maskdata/images/'
     mask_path = 'maskdata/masks/'
 
+    # 遍历图片
     for item in d:
 
         name = item['name']
@@ -62,6 +63,7 @@ def cut_pic(json_path, save_path, cut_num, size):
         # 打开 mask 图片
         mask = Image.open(mask_path + 'Mask_' + name[0:-4] + '.png').convert("RGB")
         height, width = item['image_height'], item['image_width']
+        # 遍历一个图片里面所有的缺陷区域
         for cate, box in zip(item['category'], item['bbox']):
             # 记录这是第几个盒子
             idx = 0
@@ -77,7 +79,8 @@ def cut_pic(json_path, save_path, cut_num, size):
                             + '_' + str(cate) + '_' + str(idx) + '.png'
                 # 如果存在就不用裁剪，省得浪费时间
                 if os.path.exists(image_path):
-                    cnt += 1 / cut_num
+                    # 一张图片只是 [数量 * 盒子] 分之一
+                    cnt += 1 / (cut_num * len(item['bbox']))
                     # print(image_path)
                     continue
                 # 保存的 json
@@ -167,6 +170,7 @@ def cut_pic(json_path, save_path, cut_num, size):
             idx += 1
 
         print(cnt, '/', 30460)
+        # 遍历完一张图片，自增
         cnt += 1
 
     with open(save_path + 'cut_data.json', 'w') as f:

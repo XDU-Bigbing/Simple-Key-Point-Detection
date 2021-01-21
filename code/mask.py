@@ -41,7 +41,8 @@ def generate_mask(json_path, save_path, colors):
             x0, y0 = int(pic['bbox'][0]), int(pic['bbox'][1])
             x1, y1 = int(pic['bbox'][2]), int(pic['bbox'][3])
             # 对异常区域创建矩形 作为掩码
-            im1 = Image.new('RGB', (x1-x0, y1-y0), colors[str(pic['category'])])
+            im1 = Image.new('RGB', (x1 - x0, y1 - y0),
+                            colors[str(pic['category'])])
             im.paste(im1, (x0, y0))
         # 太慢了
         # num = np.unique(np.array(im))
@@ -54,8 +55,6 @@ def generate_mask(json_path, save_path, colors):
             assert len(np.unique(a)) > 0
         print(cnt)
         cnt += 1
-        if cnt >= 500:
-            break
 
 
 if __name__ == "__main__":
