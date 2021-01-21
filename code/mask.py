@@ -26,9 +26,9 @@ def generate_mask(json_path, save_path, colors):
         # 有多个图片，排序
     d_sort = sorted(d, key=itemgetter('name', 'category', 'bbox'))
     for name, items in groupby(d_sort, key=itemgetter('name')):
-        # if os.path.exists(save_path + 'Mask_' + name[:-4] + '.png'):
-        #     cnt += 1
-        #     continue
+        if os.path.exists(save_path + 'Mask_' + name[:-4] + '.png'):
+            cnt += 1
+            continue
         height, width = None, None
         # 只能遍历一次
         # 变量作用域
@@ -54,6 +54,8 @@ def generate_mask(json_path, save_path, colors):
             assert len(np.unique(a)) > 0
         print(cnt)
         cnt += 1
+        if cnt >= 500:
+            break
 
 
 if __name__ == "__main__":

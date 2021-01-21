@@ -8,12 +8,13 @@ Copyright 2020 - 2021 XDU, XDU
 -----------
 Description: 切分原始数据，原始数据怎么切，mask 数据就怎么切
 '''
+import numpy as np
 import os, json, random
-from PIL import Image
+from PIL import Image, ImageFile
 from itertools import groupby
 from operator import itemgetter
 from collections import defaultdict
-from PIL import ImageFile
+
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 
@@ -103,14 +104,15 @@ def cut_pic(json_path, save_path, cut_num, size):
                 # 不满足以上任何情况
                 if x1 - x0 <= size and x1 + 1 >= size:
                     a, b = int(x1) + 1 - size, int(x0) - 1
+                    # 防止 a 大于等于 b
                     while a >= b:
-                        a -= 1
+                        a -= 5
                     left = random.randint(a, b)
 
                 if y1 - y0 <= size and y1 + 1 >= size:
                     a, b = int(y1) + 1 - size, int(y0) - 1
                     while a >= b:
-                        a -= 1
+                        a -= 5
                     top = random.randint(a, b)
 
                 # 开始裁剪 正样本
@@ -145,6 +147,11 @@ def cut_pic(json_path, save_path, cut_num, size):
 
                 region = image.crop((left, top, left + size, top + size))
                 mask_region = mask.crop((left, top, left + size, top + size))
+
+                # 检验，如果只切割了背景，异常中断
+                a1 = np.array(mask_region)
+                assert len(np.unique(a1) > 0), mask_image_path
+
                 region.save(image_path)
                 mask_region.save(mask_image_path)
                 dict_p['name'] = mask_image_path
