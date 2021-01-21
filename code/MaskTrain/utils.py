@@ -139,23 +139,24 @@ def all_gather(data):
 def reduce_dict(input_dict, average=True):
     """
     Args:
-        input_dict (dict): all the values will be reduced
-        average (bool): whether to do average or sum
-    Reduce the values in the dictionary from all processes so that all processes
-    have the averaged results. Returns a dict with the same fields as
-    input_dict, after reduction.
+        input_dict (dict): 所有的误差
+        average (bool): 对所有卡上误差求和后平均，之后所有进程会有平均的结果，将结果返回
     """
+    # 进程数量
     world_size = get_world_size()
     if world_size < 2:
         return input_dict
+    # 此时不梯度下降
     with torch.no_grad():
         names = []
         values = []
-        # sort the keys so that they are consistent across processes
+        # 对分类损失，回归损失，mask 损失进行排序
         for k in sorted(input_dict.keys()):
             names.append(k)
             values.append(input_dict[k])
+        # 将损失拼接
         values = torch.stack(values, dim=0)
+        # 阻塞等待通信完成
         dist.all_reduce(values)
         if average:
             values /= world_size
@@ -211,6 +212,7 @@ class MetricLogger(object):
     def add_meter(self, name, meter):
         self.meters[name] = meter
 
+    # 返回训练数据
     def log_every(self, iterable, print_freq, header=None):
         i = 0
         if not header:
@@ -219,6 +221,7 @@ class MetricLogger(object):
         end = time.time()
         iter_time = SmoothedValue(fmt='{avg:.4f}')
         data_time = SmoothedValue(fmt='{avg:.4f}')
+        # 获取全部数据的长度
         space_fmt = ':' + str(len(str(len(iterable)))) + 'd'
         log_msg = self.delimiter.join([
             header,
@@ -232,6 +235,7 @@ class MetricLogger(object):
         MB = 1024.0 * 1024.0
         for obj in iterable:
             data_time.update(time.time() - end)
+            # 返回一个调用对象
             yield obj
             iter_time.update(time.time() - end)
             if i % print_freq == 0 or i == len(iterable) - 1:
@@ -254,12 +258,12 @@ def collate_fn(batch):
     return tuple(zip(*batch))
 
 
-# 唤醒学习率衰减
+# 计算新的学习率
 def warmup_lr_scheduler(optimizer, warmup_iters, warmup_factor):
 
-    # 设置每个参数的衰减次数
+    # 初始学习率乘上这个函数的返回值作为新的学习率
     def f(x):
-        # 传入的参数是 epoch ，大于 1000 衰减 1 次
+        # 传入的参数是 epoch ，大于 1000 不在衰减
         if x >= warmup_iters:
             return 1
         alpha = float(x) / warmup_iters

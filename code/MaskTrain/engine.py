@@ -30,36 +30,45 @@ def train_one_epoch(model, optimizer, data_loader, device, epoch, print_freq):
         # 设置每个 epoch 的学习率衰减
         lr_scheduler = utils.warmup_lr_scheduler(optimizer, warmup_iters, warmup_factor)
 
+    # 开始训练
     for images, targets in metric_logger.log_every(data_loader, print_freq, header):
+        # model 传入的参数是列表
         images = list(image.to(device) for image in images)
+        # 这里修改源代码, 之前的源代码只能获取 key, 但需要 value
+        targets['boxes'] = targets['boxes'].reshape(-1, 4)
         targets = [{k: v.to(device) for k, v in targets.items()}]
-
+        # 模型返回的误差，包括 分类、回归和 mask 的误差
         loss_dict = model(images, targets)
-
+        # 对 loss 求和
         losses = sum(loss for loss in loss_dict.values())
 
-        # reduce losses over all GPUs for logging purposes
+        # 获取所有卡上的平均误差
         loss_dict_reduced = utils.reduce_dict(loss_dict)
+        # 平均后的三个误差求和
         losses_reduced = sum(loss for loss in loss_dict_reduced.values())
 
         loss_value = losses_reduced.item()
-
         if not math.isfinite(loss_value):
             print("Loss is {}, stopping training".format(loss_value))
             print(loss_dict_reduced)
             sys.exit(1)
 
+        # 清空上次梯度
         optimizer.zero_grad()
+        # 应该用平均误差去反向传播，和我的认知的 reduce_all 有所偏差
         losses.backward()
+        # 优化
         optimizer.step()
 
         if lr_scheduler is not None:
             lr_scheduler.step()
 
+        # 更新的是 累积的 loss ? 下一次就没了啊
         metric_logger.update(loss=losses_reduced, **loss_dict_reduced)
         metric_logger.update(lr=optimizer.param_groups[0]["lr"])
 
     return loss_value
+
 
 
 def _get_iou_types(model):
@@ -76,15 +85,17 @@ def _get_iou_types(model):
 
 @torch.no_grad()
 def evaluate(model, data_loader, device):
+    # 在 CPU 上单线程评估
     n_threads = torch.get_num_threads()
-    # FIXME remove this and make paste_masks_in_image run on the GPU
     torch.set_num_threads(1)
     cpu_device = torch.device("cpu")
     model.eval()
     metric_logger = utils.MetricLogger(delimiter="  ")
     header = 'Test:'
 
+    # 获取各种类别的标签
     coco = get_coco_api_from_dataset(data_loader.dataset)
+    # 张量类型
     iou_types = ["bbox"]
     coco_evaluator = CocoEvaluator(coco, iou_types)
 

@@ -144,6 +144,7 @@ def _coco_remove_images_without_annotations(dataset, cat_list=None):
 
 
 def convert_to_coco_api(ds):
+    # 普通数据转 coco 数据
     coco_ds = COCO()
     ann_id = 0
     dataset = {'images': [], 'categories': [], 'annotations': []}
@@ -194,7 +195,9 @@ def convert_to_coco_api(ds):
     return coco_ds
 
 
+# 输入的参数是数据集
 def get_coco_api_from_dataset(dataset):
+    # 检测，直到目标数据集是 torchvision.datasets.CocoDetection
     for i in range(10):
         if isinstance(dataset, torchvision.datasets.CocoDetection):
             break
@@ -202,6 +205,7 @@ def get_coco_api_from_dataset(dataset):
             dataset = dataset.dataset
     if isinstance(dataset, torchvision.datasets.CocoDetection):
         return dataset.coco
+    # 最终目标数据是 torch.utils.data.Subset 在这里转 coco 数据集
     return convert_to_coco_api(dataset)
 
 

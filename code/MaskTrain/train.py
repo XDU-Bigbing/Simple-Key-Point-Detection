@@ -31,6 +31,7 @@ class Dataset(object):
         self.masks = list(sorted(os.listdir(os.path.join(root, "masks"))))
         # 颜色的 RGB 从16进制转为10进制，解析到对应的类别
         self.color_to_category = {
+            '0': 0,
             '17': 1,
             '34': 2,
             '51': 3,
@@ -54,40 +55,42 @@ class Dataset(object):
         mask = np.array(mask)
         masks = np.zeros(mask.shape, dtype=bool)
         # 实例被编码为不同的颜色
-        obj_ids = np.unique(mask)
+        obj = np.unique(mask)
         # 移除不同背景色
-        obj_ids = obj_ids[1:]
+        obj_ids = obj[1:]
+        # 切分数据总是有 bug
+        if len(obj_ids) == 0:
+            obj_ids = obj[0:]
 
-        # 返回一个 np 数组
-        # mask == obj_ids 的部分为 true，以此来检测 box
-        # [None] 在指定位置添加一个 1 的维度，此处为维度对齐
+        # 原始代码中，mask == obj_ids 的部分为 true，以此来检测 box
+        # 但唯独不一致，可能会导致后期的 error 
+        # 这里修改源代码
 
         # 获取每个图片上 mask 的数量 
         # 即有几个目标需要检测
         boxes = []
-        print('obj_ids is ', obj_ids)
         for i, value in enumerate(obj_ids):
-            print('here')
+            # 获取第 i 个目标
             pos = np.where(mask == obj_ids[i])
+            # masks 是二值化的
             masks[pos] = True
             xmin = np.min(pos[1])
             xmax = np.max(pos[1])
             ymin = np.min(pos[0])
             ymax = np.max(pos[0])
-            print(xmin, xmax, ymin, ymax)
             boxes.append([xmin, ymin, xmax, ymax])
-        print(boxes)
+
         boxes = torch.as_tensor(boxes, dtype=torch.float32)
         # 只有一个类，多少个目标就多少个 1 
         # 只检测目标，不区分具体是哪个目标
         # [1个batch，num_obj个盒子]
         # 写法参考：
         # https://github.com/pytorch/vision/blob/0985533eccf4adf583b4c9164d492d70a8226422/torchvision/models/detection/faster_rcnn.py#L330-L331
-        labels = torch.zeros((1, len(obj_ids)), dtype=torch.int64)
+        labels = torch.zeros(6, dtype=torch.int64)
         # 获取第 i 个标签的类别
         for i, value in enumerate(obj_ids):
-            labels[0][i] = self.color_to_category[str(value)]
-        
+            labels[i] = self.color_to_category[str(value)]
+        labels = torch.ones((len(obj_ids),), dtype=torch.int64)
         masks = torch.as_tensor(masks, dtype=torch.uint8)
 
         # 按照文件名生成图片的 id
@@ -185,6 +188,8 @@ def main():
     dataset_test = torch.utils.data.Subset(dataset_test, indices[-train_data_size:])
 
     # 加载数据
+    # num_workers 服务器普通用户没多线程权限
+    # batch_size 大于 1 时，盒子数量不一致，targets 数据拼接不上
     data_loader = torch.utils.data.DataLoader(
         dataset, batch_size=1, shuffle=True)
 
