@@ -52,7 +52,7 @@ def generate_mask(json_path, save_path, colors):
         # 抽查
         if cnt % 17 == 0 and cnt != 0:
             a = np.array(im)
-            assert len(np.unique(a)) > 0
+            assert len(np.unique(a)) > 1
         print(cnt)
         cnt += 1
 

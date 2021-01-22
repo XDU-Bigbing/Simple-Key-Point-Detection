@@ -7,7 +7,7 @@ import torchvision
 from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
 from torchvision.models.detection.mask_rcnn import MaskRCNNPredictor
 from torchvision.transforms import functional as F
-
+from torch.autograd import Variable
 from engine import train_one_epoch, evaluate, predict
 import utils
 import transforms as T
@@ -58,6 +58,7 @@ class Dataset(object):
         obj = np.unique(mask)
         # 移除不同背景色
         obj_ids = obj[1:]
+        print(obj_ids)
         # 切分数据总是有 bug
         if len(obj_ids) == 0:
             obj_ids = obj[0:]
@@ -86,11 +87,11 @@ class Dataset(object):
         # [1个batch，num_obj个盒子]
         # 写法参考：
         # https://github.com/pytorch/vision/blob/0985533eccf4adf583b4c9164d492d70a8226422/torchvision/models/detection/faster_rcnn.py#L330-L331
-        labels = torch.zeros(6, dtype=torch.int64)
+        labels = torch.zeros(len(obj_ids), dtype=torch.int64)
         # 获取第 i 个标签的类别
         for i, value in enumerate(obj_ids):
             labels[i] = self.color_to_category[str(value)]
-        labels = torch.ones((len(obj_ids),), dtype=torch.int64)
+        labels = labels.squeeze()
         masks = torch.as_tensor(masks, dtype=torch.uint8)
 
         # 按照文件名生成图片的 id

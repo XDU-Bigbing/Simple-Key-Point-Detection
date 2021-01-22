@@ -10,6 +10,7 @@ Description: 切分原始数据，原始数据怎么切，mask 数据就怎么�
 '''
 import numpy as np
 import os, json, random
+import utils
 from PIL import Image, ImageFile
 from itertools import groupby
 from operator import itemgetter
@@ -25,8 +26,10 @@ def sum_json(json_path, json_path_sum):
     d = {}
     with open(json_path, 'r') as f:
         d = json.load(f)
+    # 排序
     d_sort = sorted(d, key=itemgetter('name', 'category', 'bbox'))
     result = []
+    # 分组整合
     for name, items in groupby(d_sort, key=itemgetter('name')):
         d_save = defaultdict(list)
         d_save['name'] = name
@@ -40,7 +43,7 @@ def sum_json(json_path, json_path_sum):
         json.dump(result, f, indent=4)
 
 
-def cut_pic(json_path, save_path, cut_num, size):
+def cut_pic(json_path, save_path, cut_num, size, ismask):
     '''
     切分图片，原始图片怎么切，mask 图片就怎么切
     '''
@@ -51,8 +54,8 @@ def cut_pic(json_path, save_path, cut_num, size):
         d = json.load(f)
     
     # 保存文件的路径
-    data_path = 'maskdata/images/'
-    mask_path = 'maskdata/masks/'
+    data_path = '../MaskRCNN/maskdata/images/'
+    mask_path = '../MaskRCNN/maskdata/masks/'
 
     # 遍历图片
     for item in d:
@@ -61,27 +64,36 @@ def cut_pic(json_path, save_path, cut_num, size):
         # 打开原始图片
         image = Image.open(data_path + name).convert("RGB")
         # 打开 mask 图片
-        mask = Image.open(mask_path + 'Mask_' + name[0:-4] + '.png').convert("RGB")
+        if ismask:
+            mask = Image.open(mask_path + 'Mask_' + name[0:-4] + '.png').convert("RGB")
         height, width = item['image_height'], item['image_width']
         # 遍历一个图片里面所有的缺陷区域
+        # 记录这是第几个盒子
+        idx = 0
         for cate, box in zip(item['category'], item['bbox']):
-            # 记录这是第几个盒子
-            idx = 0
             # 坐标
             x0, y0 = box[0], box[1]
             x1, y1 = box[2], box[3]
-            # 裁剪 cut_num 张图片
-            for j in range(cut_num):
+            # 裁剪 cut_num 张图片 这里做类别平衡处理
+            # 每个类 1000 张
+            cut_num_ = None
+            if cut_num >= 300 and (cate == 1 or cate == 6):
+                if cate == 1:
+                    cut_num_ = 2
+                if cate == 6:
+                    cut_num_ = 3
+            else:
+                cut_num_ = 1
+            for j in range(cut_num_):
                 # 图片命名：图片名_第几张_类别_第几个盒子，防止覆盖文件
-                image_path = save_path + 'images/' + name[0:-4] + '_' + str(j) \
-                             + '_' + str(cate) + '_' + str(idx) + '.png'
-                mask_image_path = save_path + 'masks/' + name[0:-4] + '_' + str(j) \
-                            + '_' + str(cate) + '_' + str(idx) + '.png'
+                pic_name = name[0:-4] + '_' + str(j) + '_' + str(cate) + '_' + str(idx) + '.png'
+                image_path = save_path + 'images/' + pic_name
+                if ismask:
+                    mask_image_path = save_path + 'masks/' + pic_name
                 # 如果存在就不用裁剪，省得浪费时间
                 if os.path.exists(image_path):
-                    # 一张图片只是 [数量 * 盒子] 分之一
-                    cnt += 1 / (cut_num * len(item['bbox']))
-                    # print(image_path)
+                    cnt += 1 
+                    print(image_path)
                     continue
                 # 保存的 json
                 dict_p = {}
@@ -149,15 +161,20 @@ def cut_pic(json_path, save_path, cut_num, size):
                             top += 5
 
                 region = image.crop((left, top, left + size, top + size))
-                mask_region = mask.crop((left, top, left + size, top + size))
+                if ismask:
+                    mask_region = mask.crop((left, top, left + size, top + size))
 
-                # 检验，如果只切割了背景，异常中断
-                a1 = np.array(mask_region)
-                assert len(np.unique(a1) > 0), mask_image_path
+                    # 检验，如果只切割了背景，异常中断
+                    a1 = np.array(mask_region)
+                    assert len(np.unique(a1)) > 1, mask_image_path
+                    mask_region.save(mask_image_path)
 
                 region.save(image_path)
-                mask_region.save(mask_image_path)
-                dict_p['name'] = mask_image_path
+                print(cnt, '/', 3600)
+                # 遍历完一张图片，自增
+                cnt += 1
+
+                dict_p['name'] = pic_name
                 dict_p['category'] = cate
                 # 保留残缺区域的相对位置
                 dict_p['bbox'] = [
@@ -169,10 +186,6 @@ def cut_pic(json_path, save_path, cut_num, size):
                 ls.append(dict_p)
             idx += 1
 
-        print(cnt, '/', 30460)
-        # 遍历完一张图片，自增
-        cnt += 1
-
     with open(save_path + 'cut_data.json', 'w') as f:
         json.dump(ls, f, indent=4)
 
@@ -180,19 +193,29 @@ def cut_pic(json_path, save_path, cut_num, size):
 if __name__ == "__main__":
 
     # 原始数据的 json
-    JSONPATH = 'maskdata/train_annos.json'
+    JSONPATH = 'train_annos.json'
     # json 文件汇总，即一个图片里面有好几个损坏,把他们整合到一起
-    JSONPATHSUM = 'maskdata/train_sum.json'
-    if not os.path.exists(JSONPATHSUM):
-        print('汇总 json 文件')
-        sum_json(json_path=JSONPATH, json_path_sum=JSONPATHSUM)
-
-    # 按照汇总好的数据开始切
-    SAVEPATH = 'maskdata/preprocess/'
+    JSONPATHSUM = 'cut_1000/cut_1000_sum.json'
+    # 采样的 json
+    SAMPLEPATH = 'cut_1000/cut_1000_sample.json'
+    # 图片保存路径
+    SAVEPATH = 'cut_1000/'
     # 目标区域裁剪几张
-    CUTNUM = 2
+    CUTNUM = 1
     # 目标区域的尺寸
     SIZE = 512
-    cut_pic(json_path=JSONPATHSUM, save_path=SAVEPATH, cut_num=CUTNUM, size=SIZE)
+    # 每个类选择 NUM 张
+    NUM = 1000
+
+    # 返回要裁剪的 json 的路径
+    cut_json_path = utils.select_pic(json_path=JSONPATH, sample_path=SAMPLEPATH, num=NUM, all=False)
+
+    # 汇总
+    if not os.path.exists(JSONPATHSUM):
+        print('汇总 json 文件')
+        sum_json(json_path=cut_json_path, json_path_sum=JSONPATHSUM)
+
+    # 按照汇总好的数据开始切
+    cut_pic(json_path=JSONPATHSUM, save_path=SAVEPATH, cut_num=CUTNUM, size=SIZE, ismask=False)
     print('Fucking end.')
 # 157001

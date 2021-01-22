@@ -82,12 +82,15 @@
 
 # import json
 
-# path = '../data/train_annos.json'
+# path = '../data/cut_data.json'
 
 # max_x, max_y = 512, 512
 # ave_x, ave_y = 0, 0
 # cnt_x, cnt_y = 0, 0
 # min_x, min_y = 512, 512
+
+# d = {}
+
 
 # with open(path, 'r') as f:
 #     data_dict = json.load(f)
@@ -97,13 +100,23 @@
 #         # if i['bbox'][1] >= i['bbox'][3]:
 #         #     print('y error', i['name'], sep=', ')
 #         if i['bbox'][3] - i['bbox'][1] >= max_y:
-#             max_y = i['bbox'][3] - i['bbox'][1]
-#         if i['bbox'][3] - i['bbox'][1] < min_y:
-#             min_y = i['bbox'][3] - i['bbox'][1]
+#             print(i['category'], end=', ')
+#             # max_y = i['bbox'][3] - i['bbox'][1]
+#         # if i['bbox'][3] - i['bbox'][1] < min_y:
+#             # min_y = i['bbox'][3] - i['bbox'][1]
 #         if i['bbox'][2] - i['bbox'][0] >= max_x:
-#             max_x = i['bbox'][2] - i['bbox'][0]
-#         if i['bbox'][2] - i['bbox'][0] < min_x:
-#             min_x = i['bbox'][2] - i['bbox'][0]
+#             print(i['category'], end=', ')
+#             # max_x = i['bbox'][2] - i['bbox'][0]
+#         # if i['bbox'][2] - i['bbox'][0] < min_x:
+#             # min_x = i['bbox'][2] - i['bbox'][0]\
+#         if str(i['category']) not in d:
+#             d[str(i['category'])] = 1
+#         else:
+#             d[str(i['category'])] += 1
+
+# print('\n', d)
+
+# {'4': 1112, '5': 8886, '2': 2151, '3': 2174, '1': 576, '6': 331}
 
 # print(max_x, max_y, min_x, min_y, sep=', ')
 
@@ -290,3 +303,5 @@
 
 # df = pd.read_json('a.json')
 # df.to_csv('a.csv', index = None)
+
+a = None
