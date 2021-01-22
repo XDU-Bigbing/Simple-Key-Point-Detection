@@ -79,11 +79,11 @@ def cut_pic(json_path, save_path, cut_num, size, ismask):
             cut_num_ = None
             if cut_num >= 300 and (cate == 1 or cate == 6):
                 if cate == 1:
-                    cut_num_ = 2
-                if cate == 6:
                     cut_num_ = 3
+                if cate == 6:
+                    cut_num_ = 4
             else:
-                cut_num_ = 1
+                cut_num_ = cut_num
             for j in range(cut_num_):
                 # 图片命名：图片名_第几张_类别_第几个盒子，防止覆盖文件
                 pic_name = name[0:-4] + '_' + str(j) + '_' + str(cate) + '_' + str(idx) + '.png'
@@ -170,7 +170,7 @@ def cut_pic(json_path, save_path, cut_num, size, ismask):
                     mask_region.save(mask_image_path)
 
                 region.save(image_path)
-                print(cnt, '/', 3600)
+                print(cnt, '/', 2400)
                 # 遍历完一张图片，自增
                 cnt += 1
 
@@ -192,20 +192,20 @@ def cut_pic(json_path, save_path, cut_num, size, ismask):
 
 if __name__ == "__main__":
 
+    # 每个类选择 NUM 张
+    NUM = 1000
     # 原始数据的 json
     JSONPATH = 'train_annos.json'
     # json 文件汇总，即一个图片里面有好几个损坏,把他们整合到一起
-    JSONPATHSUM = 'cut_1000/cut_1000_sum.json'
+    JSONPATHSUM = 'cut_{}/cut_{}_sum.json'.format(NUM, NUM)
     # 采样的 json
-    SAMPLEPATH = 'cut_1000/cut_1000_sample.json'
+    SAMPLEPATH = 'cut_{}/cut_{}_sample.json'.format(NUM, NUM)
     # 图片保存路径
-    SAVEPATH = 'cut_1000/'
+    SAVEPATH = 'cut_{}/'.format(NUM)
     # 目标区域裁剪几张
     CUTNUM = 1
     # 目标区域的尺寸
     SIZE = 512
-    # 每个类选择 NUM 张
-    NUM = 1000
 
     # 返回要裁剪的 json 的路径
     cut_json_path = utils.select_pic(json_path=JSONPATH, sample_path=SAMPLEPATH, num=NUM, all=False)
@@ -216,6 +216,6 @@ if __name__ == "__main__":
         sum_json(json_path=cut_json_path, json_path_sum=JSONPATHSUM)
 
     # 按照汇总好的数据开始切
-    cut_pic(json_path=JSONPATHSUM, save_path=SAVEPATH, cut_num=CUTNUM, size=SIZE, ismask=False)
+    cut_pic(json_path=JSONPATHSUM, save_path=SAVEPATH, cut_num=CUTNUM, size=SIZE, ismask=True)
     print('Fucking end.')
 # 157001

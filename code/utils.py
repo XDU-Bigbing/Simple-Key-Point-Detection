@@ -36,6 +36,16 @@ def get_train_test_valid_num(**kwargs):
     return train_num, test_num, valid_num
 
 
+def judge_box_size(box):
+    max_x, max_y = 64, 64
+    if box['bbox'][2] - box['bbox'][0] >= max_x:
+        return True
+    elif box['bbox'][3] - box['bbox'][1] >= max_y:
+        return True
+    else:
+        return False
+
+
 def select_pic(json_path, sample_path, num, all):
     # 随机选 1000 张图片 
     # 从 1000 张图片里选择 6 个类的 10 张图片
@@ -47,7 +57,11 @@ def select_pic(json_path, sample_path, num, all):
         with open (json_path, 'r') as f:
             dict_ = json.load(f)
             for i in dict_:
-                classes[str(i['category'])].append(i)
+                # 去除特别大的块
+                if judge_box_size(i):
+                    continue
+                else:
+                    classes[str(i['category'])].append(i)
 
         for _, value in classes.items():
             print(len(value))
