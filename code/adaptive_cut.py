@@ -7,6 +7,7 @@ Last Modified: Sunday, 17th January 2021 3:53:34 pm
 Copyright 2020 - 2021 XDU, XDU
 -----------
 Description: 切分原始数据，原始数据怎么切，mask 数据就怎么切
+             自适应切分，使得目标区域占比相同
 '''
 import numpy as np
 import os, json, random
@@ -43,7 +44,7 @@ def sum_json(json_path, json_path_sum):
         json.dump(result, f, indent=4)
 
 
-def cut_pic(json_path, save_path, scale, cut_num, ismask, adaptive):
+def cut_pic(json_path, save_path, scale, cut_num, ismask):
     '''
     切分图片，原始图片怎么切，mask 图片就怎么切
     '''
@@ -54,8 +55,8 @@ def cut_pic(json_path, save_path, scale, cut_num, ismask, adaptive):
         d = json.load(f)
     
     # 保存文件的路径
-    data_path = '../DATA/tile_round1_train_20201231/images/'
-    mask_path = '../DATA/MASK_Train/masks/'
+    data_path = '../MaskRCNN/maskdata/images/'
+    mask_path = '../MaskRCNN/maskdata/masks/'
 
     # 遍历图片
     for item in d:
@@ -74,24 +75,18 @@ def cut_pic(json_path, save_path, scale, cut_num, ismask, adaptive):
             # 坐标
             x0, y0 = box[0], box[1]
             x1, y1 = box[2], box[3]
-            # 裁剪图片的大小
-            random_width, random_height = None, None
-            # 如果自适应
-            if adaptive:
-                # 计算裁剪的高度和宽度
-                window = random.randint(-3, 4)
-                random_width = random.randint(int(x1 - x0) * scale, int(x1 - x0) * (scale + window))
-                random_height = random.randint(int(y1 - y0) * scale, int(y1 - y0) * (scale + window))
 
-                # 如果缩放后超出原来图片的大小
-                if random_height > height:
-                    random_height = height
-                if random_width > width:
-                    random_width = width
-            # 不自适应
-            else: 
-                random_width, random_height = width, height
-            
+            # 计算裁剪的高度和宽度
+            window = random.randint(-2, 3)
+            random_width = random.randint(int(x1 - x0) * scale, int(x1 - x0) * (scale + window))
+            random_height = random.randint(int(y1 - y0) * scale, int(y1 - y0) * (scale + window))
+
+            # 如果缩放后超出原来图片的大小
+            if random_height > height:
+                random_height = height
+            if random_width > width:
+                random_width = width 
+
             # 裁剪 cut_num 张图片 这里做类别平衡处理
             # 每个类 1000 张
             cut_num_ = None
@@ -202,14 +197,11 @@ def cut_pic(json_path, save_path, scale, cut_num, ismask, adaptive):
                     round(x1 - left, 2), 
                     round(y1 - top, 2)
                 ]
-                d['image_height'] = random_height
-                d['image_width'] = random_width
                 ls.append(dict_p)
             idx += 1
 
     with open(save_path + 'cut_data.json', 'w') as f:
         json.dump(ls, f, indent=4)
-
 
 
 if __name__ == "__main__":
@@ -226,7 +218,7 @@ if __name__ == "__main__":
     SAVEPATH = 'cut_{}/'.format(NUM)
     # 目标区域裁剪几张
     CUTNUM = 1
-    # 目标区域的尺寸
+    # 缩减比例
     SCALE = 10
 
     # 返回要裁剪的 json 的路径
@@ -238,6 +230,6 @@ if __name__ == "__main__":
         sum_json(json_path=cut_json_path, json_path_sum=JSONPATHSUM)
 
     # 按照汇总好的数据开始切
-    cut_pic(json_path=JSONPATHSUM, save_path=SAVEPATH, scale=SCALE, cut_num=CUTNUM, ismask=False, adaptive=True)
+    cut_pic(json_path=JSONPATHSUM, save_path=SAVEPATH, scale=SCALE, cut_num=CUTNUM, ismask=True)
     print('Fucking end.')
 # 157001

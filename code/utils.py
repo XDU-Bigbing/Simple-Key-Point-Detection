@@ -36,14 +36,18 @@ def get_train_test_valid_num(**kwargs):
     return train_num, test_num, valid_num
 
 
-def judge_box_size(box):
-    max_x, max_y = 64, 64
-    if box['bbox'][2] - box['bbox'][0] >= max_x:
-        return True
-    elif box['bbox'][3] - box['bbox'][1] >= max_y:
-        return True
-    else:
+def judge_box_size(box, remove=False):
+    # 训练结果并不好
+    if not remove:
         return False
+    if remove:
+        max_x, max_y = 64, 64
+        if box['bbox'][2] - box['bbox'][0] >= max_x:
+            return True
+        elif box['bbox'][3] - box['bbox'][1] >= max_y:
+            return True
+        else:
+            return False
 
 
 def select_pic(json_path, sample_path, num, all):
@@ -58,7 +62,7 @@ def select_pic(json_path, sample_path, num, all):
             dict_ = json.load(f)
             for i in dict_:
                 # 去除特别大的块
-                if judge_box_size(i):
+                if judge_box_size(i, remove=False):
                     continue
                 else:
                     classes[str(i['category'])].append(i)
