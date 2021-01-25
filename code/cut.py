@@ -41,6 +41,13 @@ def sum_json(json_path, json_path_sum):
         result.append(d_save)
     with open(json_path_sum, 'w') as f:
         json.dump(result, f, indent=4)
+    with open(json_path_sum, 'r') as f:
+        ls = [0 for i in range(6)]
+        d = json.load(f)
+        for i in d:
+            for cate in i['category']:
+                ls[cate - 1] += 1
+        print(ls)
 
 
 def cut_pic(json_path, save_path, num, scale, cut_num, ismask, adaptive):
@@ -98,14 +105,14 @@ def cut_pic(json_path, save_path, num, scale, cut_num, ismask, adaptive):
             else: 
                 random_width, random_height = width, height
             
-            # 裁剪 cut_num 张图片 这里做类别平衡处理
+            # 裁剪 cut_num 张图片 这里做类别平衡处理 盒子的数量
             # {'4': 1112, '5': 8886, '2': 2151, '3': 2174, '1': 576, '6': 331}
             cut_num_ = None
             if num >= 300 and (cate == 1 or cate == 6):
                 if cate == 1:
-                    cut_num_ = 2 * cut_num
+                    cut_num_ = 4
                 if cate == 6:
-                    cut_num_ = 3 * cut_num
+                    cut_num_ = 6
             else:
                 cut_num_ = cut_num
 

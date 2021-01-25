@@ -62,9 +62,9 @@ def select_pic(json_path, sample_path, num, all):
             dict_ = json.load(f)
             for i in dict_:
                 # 去除特别大的块
-                if judge_box_size(i, remove=False):
-                    continue
-                else:
+                # if judge_box_size(i, remove=False):
+                #     continue
+                # else:
                     classes[str(i['category'])].append(i)
 
         for _, value in classes.items():
